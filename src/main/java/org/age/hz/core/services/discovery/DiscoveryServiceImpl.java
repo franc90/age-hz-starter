@@ -3,7 +3,9 @@ package org.age.hz.core.services.discovery;
 import com.google.common.collect.ImmutableSet;
 import com.hazelcast.core.IMap;
 import com.hazelcast.map.listener.MapListener;
+import org.age.hz.core.node.NodeId;
 import org.age.hz.core.services.AbstractService;
+import org.age.hz.core.services.discovery.listeners.HazelcastLifecycleListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.SmartLifecycle;
@@ -46,7 +48,7 @@ public class DiscoveryServiceImpl extends AbstractService implements SmartLifecy
         log.debug("Neighbours: {} ");
         running.set(true);
         hazelcastInstance.getLifecycleService().addLifecycleListener(new HazelcastLifecycleListener());
-        members.set(nodeId.getNodeId(), nodeId);
+        members.set(myId.getNodeId(), myId);
         log.debug("Discovery service started");
     }
 
@@ -91,6 +93,6 @@ public class DiscoveryServiceImpl extends AbstractService implements SmartLifecy
     public void cleanUp() {
         members.removeEntryListener(neighboursListenerId);
         log.debug("Deleting myself from members map");
-        members.remove(nodeId.getNodeId());
+        members.remove(myId.getNodeId());
     }
 }

@@ -1,21 +1,30 @@
-package org.age.hz.core.services.discovery;
+package org.age.hz.core.services.discovery.events;
 
 import com.google.common.base.MoreObjects;
+import com.hazelcast.core.EntryEvent;
+import org.age.hz.core.node.NodeId;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import javax.inject.Named;
-import java.io.Serializable;
-import java.util.UUID;
-
-@Named
-public class NodeId implements Serializable {
+public class MemberAddedEvent implements MembershipChangedEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private final String nodeId = UUID.randomUUID().toString();
+    private final String id;
 
-    public String getNodeId() {
+    private final NodeId nodeId;
+
+    public MemberAddedEvent(EntryEvent<String, NodeId> event) {
+        id = event.getKey();
+        nodeId = event.getValue();
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    public NodeId getNodeId() {
         return nodeId;
     }
 
@@ -25,16 +34,18 @@ public class NodeId implements Serializable {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        NodeId nodeId1 = (NodeId) o;
+        MemberAddedEvent that = (MemberAddedEvent) o;
 
         return new EqualsBuilder()
-                .append(nodeId, nodeId1.nodeId)
+                .append(id, that.id)
+                .append(nodeId, that.nodeId)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
+                .append(id)
                 .append(nodeId)
                 .toHashCode();
     }
@@ -42,7 +53,8 @@ public class NodeId implements Serializable {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("nodeId", nodeId)
+                .add("id", id)
+                .add("myId", nodeId)
                 .toString();
     }
 }

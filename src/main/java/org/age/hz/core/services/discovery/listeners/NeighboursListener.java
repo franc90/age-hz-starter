@@ -1,10 +1,13 @@
-package org.age.hz.core.services.discovery;
+package org.age.hz.core.services.discovery.listeners;
 
 import com.google.common.eventbus.EventBus;
 import com.hazelcast.core.EntryEvent;
 import com.hazelcast.map.listener.EntryAddedListener;
 import com.hazelcast.map.listener.EntryEvictedListener;
 import com.hazelcast.map.listener.EntryRemovedListener;
+import org.age.hz.core.node.NodeId;
+import org.age.hz.core.services.discovery.events.MemberAddedEvent;
+import org.age.hz.core.services.discovery.events.MemberRemovedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +26,7 @@ public class NeighboursListener implements EntryAddedListener<String, NodeId>,
 
     @Override
     public void entryAdded(EntryEvent<String, NodeId> event) {
+
         log.debug("NeighboursListener entry added: {}", event);
         eventBus.post(new MemberAddedEvent(event));
     }

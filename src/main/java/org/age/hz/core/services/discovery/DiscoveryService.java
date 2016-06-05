@@ -1,5 +1,7 @@
 package org.age.hz.core.services.discovery;
 
+import org.age.hz.core.node.NodeId;
+
 import java.util.Optional;
 import java.util.Set;
 

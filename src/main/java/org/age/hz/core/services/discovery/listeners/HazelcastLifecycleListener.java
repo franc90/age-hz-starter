@@ -1,8 +1,10 @@
-package org.age.hz.core.services.discovery;
+package org.age.hz.core.services.discovery.listeners;
 
 import com.google.common.eventbus.EventBus;
 import com.hazelcast.core.LifecycleEvent;
 import com.hazelcast.core.LifecycleListener;
+import org.age.hz.core.services.discovery.DiscoveryService;
+import org.age.hz.core.services.discovery.events.DiscoveryServiceStoppingEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

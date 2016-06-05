@@ -1,4 +1,4 @@
-package org.age.hz.core.services.discovery;
+package org.age.hz.core.services.discovery.events;
 
 import com.google.common.base.MoreObjects;
 import org.apache.commons.lang3.builder.EqualsBuilder;

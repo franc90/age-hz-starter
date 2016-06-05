@@ -1,13 +1,12 @@
-package org.age.hz.core.services.discovery;
+package org.age.hz.core.services.discovery.events;
 
 import com.google.common.base.MoreObjects;
 import com.hazelcast.core.EntryEvent;
+import org.age.hz.core.node.NodeId;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.io.Serializable;
-
-public class MemberRemovedEvent implements Serializable {
+public class MemberRemovedEvent implements MembershipChangedEvent {
 
     private static final long serialVersionUID = 1L;
 
@@ -17,6 +16,7 @@ public class MemberRemovedEvent implements Serializable {
         id = event.getKey();
     }
 
+    @Override
     public String getId() {
         return id;
     }
