@@ -9,15 +9,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import static com.hazelcast.core.LifecycleEvent.LifecycleState.SHUTTING_DOWN;
 
-
+@Named
 public class HazelcastLifecycleListener implements LifecycleListener {
 
     private static final Logger log = LoggerFactory.getLogger(HazelcastLifecycleListener.class);
 
-    DiscoveryService discoveryService;
+    @Inject
+    private DiscoveryService discoveryService;
 
     @Inject
     private EventBus eventBus;

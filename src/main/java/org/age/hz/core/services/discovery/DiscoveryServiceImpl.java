@@ -2,6 +2,7 @@ package org.age.hz.core.services.discovery;
 
 import com.google.common.collect.ImmutableSet;
 import com.hazelcast.core.IMap;
+import com.hazelcast.core.LifecycleListener;
 import com.hazelcast.map.listener.MapListener;
 import org.age.hz.core.node.NodeId;
 import org.age.hz.core.services.AbstractService;
@@ -23,6 +24,9 @@ public class DiscoveryServiceImpl extends AbstractService implements SmartLifecy
     private static final Logger log = LoggerFactory.getLogger(DiscoveryServiceImpl.class);
 
     private final AtomicBoolean running = new AtomicBoolean(false);
+
+    @Inject
+    private LifecycleListener lifecycleListener;
 
     @Inject
     private MapListener neighboursListener;
@@ -47,7 +51,7 @@ public class DiscoveryServiceImpl extends AbstractService implements SmartLifecy
         log.debug("Starting discovery service");
         log.debug("Neighbours: {} ");
         running.set(true);
-        hazelcastInstance.getLifecycleService().addLifecycleListener(new HazelcastLifecycleListener());
+        hazelcastInstance.getLifecycleService().addLifecycleListener(lifecycleListener);
         members.set(myId.getNodeId(), myId);
         log.debug("Discovery service started");
     }
