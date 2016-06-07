@@ -17,7 +17,7 @@ import static org.age.hz.core.services.topology.TopologyState.*;
 @Named
 public class TopologyServiceManager {
 
-    private static final Logger log = LoggerFactory.getLogger(TopologyServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(TopologyServiceManager.class);
 
     private static final Set<TopologyState> MEMBERSHIP_CHANGED_ELIGIBLE_STATED = ImmutableSet.of(MASTER, SLAVE, WITH_TOPOLOGY);
 
