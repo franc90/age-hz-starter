@@ -1,7 +1,7 @@
 package org.age.hz.core.services.topology.leader.election;
 
-import org.age.hz.core.services.discovery.DiscoveryService;
 import org.age.hz.core.node.NodeId;
+import org.age.hz.core.services.discovery.DiscoveryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,13 +16,17 @@ public class SimpleLeaderElector implements LeaderElector {
 
     private static final Logger log = LoggerFactory.getLogger(SimpleLeaderElector.class);
 
-    @Inject
-    private DiscoveryService discoveryService;
+    private final DiscoveryService discoveryService;
 
-    @Inject
-    private NodeId myId;
+    private final NodeId myId;
 
     private boolean master;
+
+    @Inject
+    public SimpleLeaderElector(DiscoveryService discoveryService, NodeId myId) {
+        this.discoveryService = discoveryService;
+        this.myId = myId;
+    }
 
     public NodeId electLeader() throws Throwable {
         Set<NodeId> nodes = discoveryService.getAllMembers();

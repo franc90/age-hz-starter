@@ -1,7 +1,7 @@
 package org.age.hz.core.services.topology.processor;
 
-import org.age.hz.core.services.discovery.DiscoveryService;
 import org.age.hz.core.node.NodeId;
+import org.age.hz.core.services.discovery.DiscoveryService;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
@@ -18,8 +18,12 @@ import static com.google.common.collect.Iterables.getLast;
 @Named
 public class RingTopologyProcessor implements TopologyProcessor {
 
+    private final DiscoveryService discoveryService;
+
     @Inject
-    private DiscoveryService discoveryService;
+    public RingTopologyProcessor(DiscoveryService discoveryService) {
+        this.discoveryService = discoveryService;
+    }
 
     @Override
     public DirectedGraph<String, DefaultEdge> createTopologyGraph() {

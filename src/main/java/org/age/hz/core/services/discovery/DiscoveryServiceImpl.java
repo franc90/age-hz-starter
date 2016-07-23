@@ -6,7 +6,6 @@ import com.hazelcast.core.LifecycleListener;
 import com.hazelcast.map.listener.MapListener;
 import org.age.hz.core.node.NodeId;
 import org.age.hz.core.services.AbstractService;
-import org.age.hz.core.services.discovery.listeners.HazelcastLifecycleListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.SmartLifecycle;

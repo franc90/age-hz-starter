@@ -25,30 +25,30 @@ package org.age.hz.core.compute.api;
 
 /**
  * A task that can be paused by the platform.
- *
+ * <p>
  * This interface should be implemented by all tasks that want to support pausing of the computation.
- *
+ * <p>
  * The paused task should not exit the {@link Runnable#run()} method. If it exits the method as a result of the {@link
  * #pause()} call, it will be considered finished.
  */
 public interface Pauseable extends Runnable {
 
-	/**
-	 * Pauses the task.
-	 *
-	 * This method is called by the worker service when the "pause" is requested on the computation. It may be executed
-	 * in the event-handling thread of the worker service. Thus, it should not block neither perform any long running
-	 * operations.
-	 */
-	void pause();
+    /**
+     * Pauses the task.
+     * <p>
+     * This method is called by the worker service when the "pause" is requested on the computation. It may be executed
+     * in the event-handling thread of the worker service. Thus, it should not block neither perform any long running
+     * operations.
+     */
+    void pause();
 
-	/**
-	 * Resumes the task.
-	 *
-	 * This method is called by the worker service when the "resume" is requested on the computation. It may be
-	 * executed in the event-handling thread of the worker service. Thus, it should not block neither perform any long
-	 * running operations.
-	 */
-	void resume();
+    /**
+     * Resumes the task.
+     * <p>
+     * This method is called by the worker service when the "resume" is requested on the computation. It may be
+     * executed in the event-handling thread of the worker service. Thus, it should not block neither perform any long
+     * running operations.
+     */
+    void resume();
 
 }

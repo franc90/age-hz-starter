@@ -31,11 +31,9 @@ public class WorkerServiceImpl extends AbstractService implements SmartLifecycle
 
     private static final Logger log = LoggerFactory.getLogger(WorkerServiceImpl.class);
 
-    @Inject
-    private MessageListener<WorkerMessage<Serializable>> workerTopicListener;
+    private final MessageListener<WorkerMessage<Serializable>> workerTopicListener;
 
-    @Inject
-    private TopologyService topologyService;
+    private final TopologyService topologyService;
 
     private ITopic<WorkerMessage<Serializable>> workerTopic;
 
@@ -48,6 +46,12 @@ public class WorkerServiceImpl extends AbstractService implements SmartLifecycle
     private TaskBuilder taskBuilder;
 
     private Task currentTask = NullTask.INSTANCE;
+
+    @Inject
+    public WorkerServiceImpl(TopologyService topologyService, MessageListener<WorkerMessage<Serializable>> workerTopicListener) {
+        this.topologyService = topologyService;
+        this.workerTopicListener = workerTopicListener;
+    }
 
     @PostConstruct
     public void init() {

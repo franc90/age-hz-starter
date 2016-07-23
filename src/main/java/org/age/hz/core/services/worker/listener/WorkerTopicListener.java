@@ -17,11 +17,15 @@ public class WorkerTopicListener implements MessageListener<WorkerMessage<Serial
 
     private static final Logger log = LoggerFactory.getLogger(WorkerTopicListener.class);
 
-    @Inject
-    private NodeId myId;
+    private final NodeId myId;
+
+    private final EventBus eventBus;
 
     @Inject
-    private EventBus eventBus;
+    public WorkerTopicListener(NodeId myId, EventBus eventBus) {
+        this.myId = myId;
+        this.eventBus = eventBus;
+    }
 
     @Override
     public void onMessage(Message<WorkerMessage<Serializable>> message) {

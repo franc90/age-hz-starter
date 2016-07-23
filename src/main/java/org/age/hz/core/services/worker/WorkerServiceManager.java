@@ -16,11 +16,15 @@ public class WorkerServiceManager {
 
     private static final Logger log = LoggerFactory.getLogger(WorkerServiceManager.class);
 
-    @Inject
-    private WorkerService workerService;
+    private final WorkerService workerService;
+
+    private final EventBus eventBus;
 
     @Inject
-    private EventBus eventBus;
+    public WorkerServiceManager(WorkerService workerService, EventBus eventBus) {
+        this.workerService = workerService;
+        this.eventBus = eventBus;
+    }
 
     @PostConstruct
     public void init() {
