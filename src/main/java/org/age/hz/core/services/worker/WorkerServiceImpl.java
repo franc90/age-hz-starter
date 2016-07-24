@@ -1,5 +1,6 @@
 package org.age.hz.core.services.worker;
 
+import com.google.common.util.concurrent.ListeningScheduledExecutorService;
 import com.hazelcast.core.IMap;
 import com.hazelcast.core.ITopic;
 import com.hazelcast.core.MessageListener;
@@ -9,10 +10,12 @@ import org.age.hz.core.services.worker.computation.ComputationState;
 import org.age.hz.core.services.worker.enums.ConfigurationKey;
 import org.age.hz.core.services.worker.enums.WorkerEvent;
 import org.age.hz.core.services.worker.enums.WorkerState;
+import org.age.hz.core.services.worker.events.TaskStartedEvent;
 import org.age.hz.core.services.worker.messages.WorkerMessage;
 import org.age.hz.core.services.worker.task.NullTask;
 import org.age.hz.core.services.worker.task.Task;
 import org.age.hz.core.services.worker.task.TaskBuilder;
+import org.age.hz.core.services.worker.task.TaskExecutionListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.SmartLifecycle;
@@ -21,15 +24,22 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
+import static com.google.common.util.concurrent.MoreExecutors.listeningDecorator;
+import static com.google.common.util.concurrent.MoreExecutors.shutdownAndAwaitTermination;
 import static java.util.Objects.nonNull;
+import static java.util.concurrent.Executors.newScheduledThreadPool;
 
 @Component
 public class WorkerServiceImpl extends AbstractService implements SmartLifecycle, WorkerService {
 
     private static final Logger log = LoggerFactory.getLogger(WorkerServiceImpl.class);
+
+    private final ListeningScheduledExecutorService executorService = listeningDecorator(newScheduledThreadPool(5));
 
     private final MessageListener<WorkerMessage<Serializable>> workerTopicListener;
 
@@ -68,11 +78,15 @@ public class WorkerServiceImpl extends AbstractService implements SmartLifecycle
     }
 
     @Override
+    public void setState(WorkerState state) {
+        this.state = state;
+    }
+
+    @Override
     public void internalStart() {
         log.debug("Worker service starting");
 
-        //TODO node computation state = none
-
+        setWorkerComputationState(ComputationState.NONE);
         state = WorkerState.RUNNING;
 
         if (globalComputationState() == ComputationState.CONFIGURED) {
@@ -89,6 +103,8 @@ public class WorkerServiceImpl extends AbstractService implements SmartLifecycle
 
     @Override
     public void configure() {
+        state = WorkerState.CONFIGURED;
+
         if (isTaskPresent()) {
             log.warn("Task is already configured.");
             return;
@@ -151,6 +167,91 @@ public class WorkerServiceImpl extends AbstractService implements SmartLifecycle
     @Override
     public int getPhase() {
         return Integer.MAX_VALUE;
+    }
+
+    @Override
+    public void startTask() {
+        while (environmentIsNotReady()) {
+            try {
+                log.warn("Trying to start computation when node is not ready.");
+                Thread.sleep(1000L);
+            } catch (InterruptedException e) {
+                log.error("Interrupted while waiting for environment");
+            }
+        }
+
+        log.debug("Starting task {}.", taskBuilder);
+
+//        todo communicationFacilities.forEach(CommunicationFacility::start);
+        currentTask = taskBuilder.buildAndSchedule(executorService, new TaskExecutionListener(eventBus));
+        eventBus.post(new TaskStartedEvent());
+        setWorkerComputationState(ComputationState.RUNNING);
+        changeGlobalComputationStateIfMaster(ComputationState.RUNNING);
+        state = WorkerState.EXECUTING;
+    }
+
+    @Override
+    public void pauseTask() {
+        log.debug("Pausing current task {}.", currentTask);
+        state = WorkerState.PAUSED;
+        currentTask.pause();
+    }
+
+    @Override
+    public void resumeTask() {
+        log.debug("Resuming current task {}.", currentTask);
+        state = WorkerState.EXECUTING;
+        currentTask.resume();
+    }
+
+    @Override
+    public void cancelTask() {
+        log.debug("Cancelling current task {}.", currentTask);
+        state = WorkerState.COMPUTATION_CANCELED;
+        currentTask.cancel();
+    }
+
+    @Override
+    public void taskFinished() {
+        setWorkerComputationState(ComputationState.FINISHED);
+        state = WorkerState.FINISHED;
+        final Collection<ComputationState> states = workerComputationStateMap.values(
+                v -> v.getValue() != ComputationState.FINISHED);
+        if (states.isEmpty()) {
+            log.debug("All nodes finished computation.");
+            changeGlobalComputationStateIfMaster(ComputationState.FINISHED);
+        }
+    }
+
+    @Override
+    public void taskFailed() {
+        state = WorkerState.COMPUTATION_FAILED;
+        changeGlobalComputationStateIfMaster(ComputationState.FAILED);
+    }
+
+    @Override
+    public void cleanUpAfterTask() {
+        log.debug("Cleaning up after task {}.", currentTask);
+        currentTask.cleanUp();
+        currentTask = NullTask.INSTANCE;
+        setWorkerComputationState(ComputationState.NONE);
+        changeGlobalComputationStateIfMaster(ComputationState.NONE);
+        log.debug("Clean up finished.");
+    }
+
+    @Override
+    public void terminate() {
+        log.debug("Topology service stopping.");
+        shutdownAndAwaitTermination(executorService, 10L, TimeUnit.SECONDS);
+        log.info("Topology service stopped.");
+    }
+
+    private boolean environmentIsNotReady() {
+        return !topologyService.hasTopology();
+    }
+
+    private void setWorkerComputationState(ComputationState computationState) {
+        workerComputationStateMap.set(myId.getNodeId(), computationState);
     }
 
     private ComputationState globalComputationState() {

@@ -143,10 +143,16 @@ public class TaskBuilder {
             final ListenableScheduledFuture<?> future = executorService.schedule(Runnables.withThreadName("COMPUTE", runnable),
                     0L, TimeUnit.SECONDS);
             Futures.addCallback(future, executionListener);
+
+            StartedTask task;
             if (runnable instanceof Pauseable) {
-                return new PauseableStartedTask(className, springContext, (Pauseable) runnable, future);
+                task = new PauseableStartedTask(className, springContext, (Pauseable) runnable, future);
+            } else {
+                task = new StartedTask(className, springContext, runnable, future);
             }
-            return new StartedTask(className, springContext, runnable, future);
+
+            ((TaskExecutionListener) executionListener).setCurrentTask(task);
+            return task;
         } catch (final BeansException e) {
             log.error("Cannot get runnable from the context.", e);
             throw new FailedComputationSetupException("Cannot get runnable from the context.", e);

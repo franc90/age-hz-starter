@@ -17,10 +17,14 @@ public class TaskExecutionListener implements FutureCallback<Object> {
 
     private static final Logger log = LoggerFactory.getLogger(TaskExecutionListener.class);
 
-    @Inject
-    private EventBus eventBus;
+    private final EventBus eventBus;
 
     private Task currentTask;
+
+    @Inject
+    public TaskExecutionListener(EventBus eventBus) {
+        this.eventBus = eventBus;
+    }
 
     @Override
     public void onSuccess(Object result) {
@@ -40,4 +44,7 @@ public class TaskExecutionListener implements FutureCallback<Object> {
         eventBus.post(WorkerEvent.COMPUTATION_FAILED);
     }
 
+    public void setCurrentTask(Task currentTask) {
+        this.currentTask = currentTask;
+    }
 }

@@ -42,6 +42,33 @@ public class WorkerServiceManager {
             case CONFIGURE:
                 configure();
                 break;
+            case START_EXECUTION:
+                startTask();
+                break;
+            case PAUSE_EXECUTION:
+                pauseTask();
+                break;
+            case RESUME_EXECUTION:
+                resumeTask();
+                break;
+            case CANCEL_EXECUTION:
+                cancelTask();
+                break;
+            case COMPUTATION_FINISHED:
+                computationFinished();
+                break;
+            case COMPUTATION_FAILED:
+                computationFailed();
+                break;
+            case CLEAN:
+                cleanUpAfterTask();
+                break;
+            case TERMINATE:
+                terminate();
+                break;
+            case ERROR:
+                handleError();
+                break;
             default:
                 log.debug("Pass {}", event);
         }
@@ -64,5 +91,85 @@ public class WorkerServiceManager {
 
         workerService.configure();
     }
+
+    private void startTask() {
+        if (workerService.getState() != WorkerState.CONFIGURED) {
+            log.warn("WorkerService not {} - wrong state: {}", WorkerState.CONFIGURED, workerService.getState());
+            return;
+        }
+
+        workerService.startTask();
+    }
+
+    private void pauseTask() {
+        if (workerService.getState() != WorkerState.EXECUTING) {
+            log.warn("WorkerService not {} - wrong state: {}", WorkerState.EXECUTING, workerService.getState());
+            return;
+        }
+
+        workerService.pauseTask();
+    }
+
+    private void resumeTask() {
+        if (workerService.getState() != WorkerState.PAUSED) {
+            log.warn("WorkerService not {} - wrong state: {}", WorkerState.PAUSED, workerService.getState());
+            return;
+        }
+
+        workerService.resumeTask();
+    }
+
+    private void cancelTask() {
+        if (workerService.getState() != WorkerState.CONFIGURED || workerService.getState() != WorkerState.EXECUTING || workerService.getState() != WorkerState.PAUSED) {
+            log.warn("WorkerService not {} - wrong state: {}", WorkerState.CONFIGURED, workerService.getState());
+            return;
+        }
+
+        workerService.cancelTask();
+    }
+
+    private void computationFinished() {
+        if (workerService.getState() == WorkerState.EXECUTING) {
+            workerService.taskFinished();
+        }
+
+        if (workerService.getState() == WorkerState.PAUSED) {
+            workerService.setState(WorkerState.FINISHED);
+        }
+
+
+        log.warn("WorkerService not {}  or {} - wrong state: {}", WorkerState.EXECUTING, WorkerState.PAUSED, workerService.getState());
+    }
+
+    private void computationFailed() {
+        if (workerService.getState() == WorkerState.EXECUTING) {
+            workerService.taskFailed();
+        }
+
+        if (workerService.getState() == WorkerState.PAUSED) {
+            workerService.setState(WorkerState.COMPUTATION_FAILED);
+        }
+
+
+        log.warn("WorkerService not {}  or {} - wrong state: {}", WorkerState.EXECUTING, WorkerState.PAUSED, workerService.getState());
+    }
+
+    private void cleanUpAfterTask() {
+        if (workerService.getState() != WorkerState.FINISHED) {
+            log.warn("WorkerService not {} - wrong state: {}", WorkerState.FINISHED, workerService.getState());
+            return;
+        }
+
+        workerService.cleanUpAfterTask();
+    }
+
+    private void terminate() {
+        workerService.terminate();
+    }
+
+    private void handleError() {
+        // todo ERROR + fire ERROR
+    }
+
 
 }

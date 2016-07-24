@@ -6,8 +6,25 @@ public interface WorkerService {
 
     WorkerState getState();
 
+    void setState(WorkerState state);
 
     void internalStart();
 
     void configure();
+
+    void startTask();
+
+    void pauseTask();
+
+    void cancelTask();
+
+    void resumeTask();
+
+    void taskFinished();
+
+    void taskFailed();
+
+    void cleanUpAfterTask();
+
+    void terminate();
 }
