@@ -9,6 +9,7 @@ import org.age.hz.core.services.topology.messages.MasterElectedMessage;
 import org.age.hz.core.services.topology.messages.TopologyMessage;
 import org.age.hz.core.services.topology.messages.TopologySelectedMessage;
 import org.age.hz.core.services.topology.processor.TopologyProcessor;
+import org.age.hz.core.services.worker.event.InitializeEvent;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.slf4j.Logger;
@@ -168,6 +169,7 @@ public class TopologyServiceImpl extends AbstractService implements SmartLifecyc
         cachedTopologyGraph = getCurrentTopologyGraph();
         log.debug("New cached topology size: {}", cachedTopologyGraph.vertexSet().size());
         log.debug("New cached topology: {}", cachedTopologyGraph);
+        eventBus.post(new InitializeEvent());
     }
 
     @SuppressWarnings("unchecked")
