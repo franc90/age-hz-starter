@@ -166,6 +166,7 @@ public class TopologyServiceImpl extends AbstractService implements SmartLifecyc
 
         log.debug("Get configured topology");
         cachedTopologyGraph = getCurrentTopologyGraph();
+        log.debug("New cached topology size: {}", cachedTopologyGraph.vertexSet().size());
         log.debug("New cached topology: {}", cachedTopologyGraph);
     }
 
