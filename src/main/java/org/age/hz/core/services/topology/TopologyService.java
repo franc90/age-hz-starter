@@ -30,6 +30,8 @@ public interface TopologyService {
 
     Optional<DirectedGraph<String, DefaultEdge>> getTopologyGraph();
 
+    int getNodesInTopology();
+
     Set<String> getNeighbours();
 
     void handleError();

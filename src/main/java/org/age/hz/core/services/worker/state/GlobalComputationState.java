@@ -1,10 +1,9 @@
 package org.age.hz.core.services.worker.state;
 
-public enum WorkerState {
+public enum GlobalComputationState {
 
     INIT,
-    WORKING,
-    EXECUTING,
+    COMPUTING,
     FINISHED
 
 }

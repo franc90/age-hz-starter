@@ -11,6 +11,7 @@ import org.age.hz.core.services.topology.messages.TopologySelectedMessage;
 import org.age.hz.core.services.topology.processor.TopologyProcessor;
 import org.age.hz.core.services.worker.event.InitializeEvent;
 import org.jgrapht.DirectedGraph;
+import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -195,6 +196,14 @@ public class TopologyServiceImpl extends AbstractService implements SmartLifecyc
     @Override
     public Optional<DirectedGraph<String, DefaultEdge>> getTopologyGraph() {
         return Optional.ofNullable(cachedTopologyGraph);
+    }
+
+    @Override
+    public int getNodesInTopology() {
+        return getTopologyGraph()
+                .map(Graph::vertexSet)
+                .map(Set::size)
+                .orElse(-1);
     }
 
     @Override
