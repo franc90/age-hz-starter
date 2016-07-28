@@ -21,8 +21,12 @@ public class NeighboursListener implements EntryAddedListener<String, NodeId>,
 
     private static final Logger log = LoggerFactory.getLogger(NeighboursListener.class);
 
+    private final EventBus eventBus;
+
     @Inject
-    private EventBus eventBus;
+    public NeighboursListener(EventBus eventBus) {
+        this.eventBus = eventBus;
+    }
 
     @Override
     public void entryAdded(EntryEvent<String, NodeId> event) {

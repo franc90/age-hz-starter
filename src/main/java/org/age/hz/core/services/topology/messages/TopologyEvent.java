@@ -1,4 +1,4 @@
-package org.age.hz.core.services.topology;
+package org.age.hz.core.services.topology.messages;
 
 public enum TopologyEvent {
 

@@ -1,7 +1,6 @@
 package org.age.hz.core.services.topology.messages;
 
 import com.google.common.base.MoreObjects;
-import org.age.hz.core.services.topology.TopologyEvent;
 
 import java.util.Optional;
 

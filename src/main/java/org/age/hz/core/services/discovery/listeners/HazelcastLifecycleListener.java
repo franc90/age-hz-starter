@@ -18,11 +18,14 @@ public class HazelcastLifecycleListener implements LifecycleListener {
 
     private static final Logger log = LoggerFactory.getLogger(HazelcastLifecycleListener.class);
 
-    @Inject
     private DiscoveryService discoveryService;
 
+    private final EventBus eventBus;
+
     @Inject
-    private EventBus eventBus;
+    public HazelcastLifecycleListener(EventBus eventBus) {
+        this.eventBus = eventBus;
+    }
 
     @Override
     public void stateChanged(LifecycleEvent event) {
@@ -33,4 +36,7 @@ public class HazelcastLifecycleListener implements LifecycleListener {
         }
     }
 
+    public void setDiscoveryService(DiscoveryService discoveryService) {
+        this.discoveryService = discoveryService;
+    }
 }

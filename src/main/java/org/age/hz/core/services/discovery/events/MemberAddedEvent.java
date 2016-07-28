@@ -24,10 +24,6 @@ public class MemberAddedEvent implements MembershipChangedEvent {
         return id;
     }
 
-    public NodeId getNodeId() {
-        return nodeId;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

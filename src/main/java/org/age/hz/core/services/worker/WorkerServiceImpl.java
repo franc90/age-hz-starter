@@ -1,68 +1,53 @@
 package org.age.hz.core.services.worker;
 
 import com.google.common.eventbus.Subscribe;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableScheduledFuture;
-import com.google.common.util.concurrent.ListeningScheduledExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
 import com.hazelcast.core.IMap;
 import com.hazelcast.map.listener.MapListener;
 import org.age.hz.core.services.AbstractService;
 import org.age.hz.core.services.topology.TopologyService;
+import org.age.hz.core.services.worker.computation.ComputationManager;
 import org.age.hz.core.services.worker.enums.WorkerConst;
 import org.age.hz.core.services.worker.event.ExitEvent;
 import org.age.hz.core.services.worker.event.InitializeEvent;
 import org.age.hz.core.services.worker.event.StartComputationEvent;
 import org.age.hz.core.services.worker.state.GlobalComputationState;
 import org.age.hz.core.services.worker.state.WorkerState;
-import org.age.hz.core.tasks.Task;
-import org.age.hz.core.utils.Runnables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.SmartLifecycle;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.util.List;
+import javax.inject.Named;
 import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
-@Component
+@Named
 public class WorkerServiceImpl extends AbstractService implements SmartLifecycle, WorkerService {
 
     private static final Logger log = LoggerFactory.getLogger(WorkerServiceImpl.class);
 
     private final MapListener computationStateListener;
 
-    private final List<Task> tasks;
-
     private final TopologyService topologyService;
 
-    private final FutureCallback<Object> taskExecutionListener;
+    private final ComputationManager computationManager;
 
     private final int minimalNumberOfClients;
 
     private IMap<String, GlobalComputationState> computationState;
-
-    private final ListeningScheduledExecutorService executorService = MoreExecutors.listeningDecorator(Executors.newScheduledThreadPool(5));
 
     private WorkerState workerState = WorkerState.INIT;
 
     @Inject
     public WorkerServiceImpl(@Value("${cluster.minimal.clients:3}") int minimalNumberOfClients,
                              MapListener computationStateListener,
-                             List<Task> tasks,
                              TopologyService topologyService,
-                             FutureCallback<Object> taskExecutionListener) {
+                             ComputationManager computationManager) {
         this.minimalNumberOfClients = minimalNumberOfClients;
         this.computationStateListener = computationStateListener;
-        this.tasks = tasks;
         this.topologyService = topologyService;
-        this.taskExecutionListener = taskExecutionListener;
+        this.computationManager = computationManager;
     }
 
     @PostConstruct
@@ -92,8 +77,8 @@ public class WorkerServiceImpl extends AbstractService implements SmartLifecycle
 
     @Override
     public void stop() {
+        computationManager.shutdown();
         log.debug("Stop worker service");
-        MoreExecutors.shutdownAndAwaitTermination(executorService, 10L, TimeUnit.SECONDS);
     }
 
     @Override
@@ -165,33 +150,13 @@ public class WorkerServiceImpl extends AbstractService implements SmartLifecycle
         }
 
         workerState = WorkerState.WORKING;
-        startTask();
-    }
-
-    private void startTask() {
-        log.debug("Start computation");
-
-        final String taskName = "RandomlyBreaking";
-
-        Task task = tasks
-                .stream()
-                .filter(t -> taskName.equals(t.getName()))
-                .findAny()
-                .orElse(null);
-
-        if (task == null) {
-            log.debug("Task {} not found. :(", taskName);
-            return;
-        }
-
-        ListenableScheduledFuture<?> future = executorService.schedule(Runnables.withThreadName("COMPUTE", task), 0L, TimeUnit.SECONDS);
-        Futures.addCallback(future, taskExecutionListener);
+        computationManager.startTask();
     }
 
     @Subscribe
     public void terminate(ExitEvent exitEvent) {
         log.debug("terminating");
-        MoreExecutors.shutdownAndAwaitTermination(executorService, 10L, TimeUnit.SECONDS);
+        computationManager.shutdown();
         System.exit(0);
     }
 

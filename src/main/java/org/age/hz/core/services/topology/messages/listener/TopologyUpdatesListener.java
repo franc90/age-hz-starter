@@ -1,4 +1,4 @@
-package org.age.hz.core.services.topology;
+package org.age.hz.core.services.topology.messages.listener;
 
 import com.google.common.eventbus.EventBus;
 import com.hazelcast.core.Message;
@@ -16,8 +16,12 @@ public class TopologyUpdatesListener implements MessageListener<TopologyMessage>
 
     private static final Logger log = LoggerFactory.getLogger(TopologyUpdatesListener.class);
 
+    private final EventBus eventBus;
+
     @Inject
-    private EventBus eventBus;
+    public TopologyUpdatesListener(EventBus eventBus) {
+        this.eventBus = eventBus;
+    }
 
     @PostConstruct
     public void init() {

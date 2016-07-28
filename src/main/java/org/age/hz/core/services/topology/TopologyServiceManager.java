@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.age.hz.core.services.discovery.events.MembershipChangedEvent;
+import org.age.hz.core.services.topology.messages.TopologyEvent;
+import org.age.hz.core.services.topology.state.TopologyState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +14,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Set;
 
-import static org.age.hz.core.services.topology.TopologyState.*;
+import static org.age.hz.core.services.topology.state.TopologyState.*;
 
 @Named
 public class TopologyServiceManager {
@@ -25,11 +27,15 @@ public class TopologyServiceManager {
 
     private static final Set<TopologyState> TOPOLOGY_CONFIGURED_ELIGIBLE_STATES = ImmutableSet.of(MASTER, SLAVE, WITH_TOPOLOGY);
 
-    @Inject
-    private TopologyService topologyService;
+    private final TopologyService topologyService;
+
+    private final EventBus eventBus;
 
     @Inject
-    private EventBus eventBus;
+    public TopologyServiceManager(TopologyService topologyService, EventBus eventBus) {
+        this.topologyService = topologyService;
+        this.eventBus = eventBus;
+    }
 
     @PostConstruct
     public void init() {

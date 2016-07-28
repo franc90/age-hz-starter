@@ -18,8 +18,12 @@ import static com.google.common.collect.Iterables.getLast;
 @Named
 public class RingTopologyProcessor implements TopologyProcessor {
 
+    private final DiscoveryService discoveryService;
+
     @Inject
-    private DiscoveryService discoveryService;
+    public RingTopologyProcessor(DiscoveryService discoveryService) {
+        this.discoveryService = discoveryService;
+    }
 
     @Override
     public DirectedGraph<String, DefaultEdge> createTopologyGraph() {

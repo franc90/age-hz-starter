@@ -1,7 +1,5 @@
 package org.age.hz.core.services.topology.messages;
 
-import org.age.hz.core.services.topology.TopologyEvent;
-
 import java.io.Serializable;
 import java.util.Optional;
 

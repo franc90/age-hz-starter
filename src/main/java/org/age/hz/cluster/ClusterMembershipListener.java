@@ -11,8 +11,12 @@ import javax.inject.Named;
 @Named
 public class ClusterMembershipListener implements MembershipListener {
 
+    private final EventBus eventBus;
+
     @Inject
-    private EventBus eventBus;
+    public ClusterMembershipListener(EventBus eventBus) {
+        this.eventBus = eventBus;
+    }
 
     @Override
     public void memberAdded(MembershipEvent membershipEvent) {
