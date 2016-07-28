@@ -11,10 +11,9 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 @Configuration
 @ComponentScan("org.age.hz")
 @PropertySource("classpath:cluster.properties")
-@Import({HazelcastConfiguration.class})
 public class SpringConfiguration {
 
-    @Bean
+    @Bean(name = "propertyConfigIn")
     public static PropertySourcesPlaceholderConfigurer propertyConfigIn() {
         return new PropertySourcesPlaceholderConfigurer();
     }

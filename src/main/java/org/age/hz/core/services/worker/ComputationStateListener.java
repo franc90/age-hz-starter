@@ -31,6 +31,7 @@ public class ComputationStateListener implements EntryAddedListener<String, Glob
     @Override
     public void entryAdded(EntryEvent<String, GlobalComputationState> event) {
         if (event.getValue() == GlobalComputationState.COMPUTING) {
+            log.trace("Entry added {}", event);
             eventBus.post(new InitializeEvent());
         }
     }
@@ -38,6 +39,7 @@ public class ComputationStateListener implements EntryAddedListener<String, Glob
     @Override
     public void entryUpdated(EntryEvent<String, GlobalComputationState> event) {
         if (event.getValue() == GlobalComputationState.COMPUTING) {
+            log.trace("Entry updated {}", event);
             eventBus.post(new InitializeEvent());
         }
     }

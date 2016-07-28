@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Named;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 
@@ -16,18 +17,20 @@ public class SimpleLongRunning implements Task {
     @Override
     public void run() {
         log.info("This is the simplest possible example of a computation.");
-        for (int i = 0; i < 100; i++) {
-            log.info("Iteration {}.", i);
 
-            additionalAction(i);
+        IntStream.range(0, 100).forEach(this::iterate);
+    }
 
-            try {
-                TimeUnit.SECONDS.sleep(1L);
-            } catch (final InterruptedException e) {
-                log.debug("Interrupted.", e);
-                Thread.currentThread().interrupt();
-                return;
-            }
+    private void iterate(int iterationNumber) {
+        log.info("Iteration {}.", iterationNumber);
+
+        additionalAction(iterationNumber);
+
+        try {
+            TimeUnit.SECONDS.sleep(1L);
+        } catch (final InterruptedException e) {
+            log.debug("Interrupted.", e);
+            Thread.currentThread().interrupt();
         }
     }
 

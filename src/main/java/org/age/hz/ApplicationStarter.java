@@ -3,10 +3,10 @@ package org.age.hz;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 public class ApplicationStarter implements CommandLineRunner {
-
 
     public static void main(String[] args) {
         SpringApplication.run(ApplicationStarter.class, args);
@@ -14,6 +14,5 @@ public class ApplicationStarter implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        System.out.println("Welcome to zombo.com");
     }
 }

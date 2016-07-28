@@ -1,4 +1,4 @@
-package org.age.hz.core.services.worker;
+package org.age.hz.core.services.worker.enums;
 
 public interface WorkerConst {
 

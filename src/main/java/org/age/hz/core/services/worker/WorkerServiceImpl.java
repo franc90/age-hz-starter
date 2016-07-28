@@ -10,12 +10,14 @@ import com.hazelcast.core.IMap;
 import com.hazelcast.map.listener.MapListener;
 import org.age.hz.core.services.AbstractService;
 import org.age.hz.core.services.topology.TopologyService;
+import org.age.hz.core.services.worker.enums.WorkerConst;
 import org.age.hz.core.services.worker.event.ExitEvent;
 import org.age.hz.core.services.worker.event.InitializeEvent;
 import org.age.hz.core.services.worker.event.StartComputationEvent;
 import org.age.hz.core.services.worker.state.GlobalComputationState;
 import org.age.hz.core.services.worker.state.WorkerState;
 import org.age.hz.core.tasks.Task;
+import org.age.hz.core.utils.Runnables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,10 +53,14 @@ public class WorkerServiceImpl extends AbstractService implements SmartLifecycle
     private WorkerState workerState = WorkerState.INIT;
 
     @Inject
-    public WorkerServiceImpl(MapListener computationStateListener, List<Task> tasks, @Value("${cluster.minimal.clients:3}") int minimalNumberOfClients, TopologyService topologyService, FutureCallback<Object> taskExecutionListener) {
+    public WorkerServiceImpl(@Value("${cluster.minimal.clients:3}") int minimalNumberOfClients,
+                             MapListener computationStateListener,
+                             List<Task> tasks,
+                             TopologyService topologyService,
+                             FutureCallback<Object> taskExecutionListener) {
+        this.minimalNumberOfClients = minimalNumberOfClients;
         this.computationStateListener = computationStateListener;
         this.tasks = tasks;
-        this.minimalNumberOfClients = minimalNumberOfClients;
         this.topologyService = topologyService;
         this.taskExecutionListener = taskExecutionListener;
     }
