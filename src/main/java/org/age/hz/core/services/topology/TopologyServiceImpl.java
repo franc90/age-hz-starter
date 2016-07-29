@@ -14,6 +14,7 @@ import org.age.hz.core.services.topology.messages.TopologySelectedMessage;
 import org.age.hz.core.services.topology.processor.TopologyProcessor;
 import org.age.hz.core.services.topology.state.TopologyState;
 import org.age.hz.core.services.worker.event.InitializeEvent;
+import org.age.hz.core.utils.TimeUtils;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
@@ -174,6 +175,17 @@ public class TopologyServiceImpl extends AbstractService implements SmartLifecyc
         cachedTopologyGraph = getCurrentTopologyGraph();
         log.debug("New cached topology size: {}", cachedTopologyGraph.vertexSet().size());
         log.debug("New cached topology: {}", cachedTopologyGraph);
+
+        long timestamp = System.currentTimeMillis();
+        log.info("\n" +
+                        "++++++++++++++++++++++++++++++++++++++++++++\n" +
+                        "Topology CONFIGURED\n" +
+                        "at     {} [{}]\n" +
+                        "++++++++++++++++++++++++++++++++++++++++++++\n",
+                TimeUtils.toString(timestamp),
+                timestamp);
+
+
         eventBus.post(new InitializeEvent());
     }
 
