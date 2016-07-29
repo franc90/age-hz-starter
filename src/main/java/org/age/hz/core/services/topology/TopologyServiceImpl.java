@@ -1,5 +1,6 @@
 package org.age.hz.core.services.topology;
 
+import com.google.common.collect.ImmutableSet;
 import com.hazelcast.core.IMap;
 import com.hazelcast.core.ITopic;
 import com.hazelcast.core.MessageListener;
@@ -202,11 +203,21 @@ public class TopologyServiceImpl extends AbstractService implements SmartLifecyc
     }
 
     @Override
-    public int getNodesInTopology() {
+    public int getNodesCount() {
         return getTopologyGraph()
                 .map(Graph::vertexSet)
                 .map(Set::size)
                 .orElse(-1);
+    }
+
+    @Override
+    public Set<String> getNodes() {
+        if (!hasTopology()) {
+            throw new IllegalStateException("Topology is not ready yet.");
+        }
+
+        DirectedGraph<String, DefaultEdge> topologyGraph = getCurrentTopologyGraph();
+        return ImmutableSet.copyOf(topologyGraph.vertexSet());
     }
 
     @Override

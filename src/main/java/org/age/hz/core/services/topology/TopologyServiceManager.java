@@ -82,8 +82,8 @@ public class TopologyServiceManager {
             return;
         }
 
-        topologyService.internalStart();
         topologyService.setState(TopologyState.STARTING);
+        topologyService.internalStart();
     }
 
     private void started() {

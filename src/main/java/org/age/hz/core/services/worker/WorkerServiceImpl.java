@@ -114,7 +114,7 @@ public class WorkerServiceImpl extends AbstractService implements SmartLifecycle
             return;
         }
 
-        int nodesInTopology = topologyService.getNodesInTopology();
+        int nodesInTopology = topologyService.getNodesCount();
         if (minimalNumberOfClients > nodesInTopology) {
             log.info("Waiting for more nodes. [{} of {}]", nodesInTopology, minimalNumberOfClients);
             return;
@@ -140,7 +140,9 @@ public class WorkerServiceImpl extends AbstractService implements SmartLifecycle
     }
 
     @Subscribe
-    public void startComputation(StartComputationEvent startComputationEvent) {
+    public void startComputation(StartComputationEvent startComputationEvent) throws InterruptedException {
+        Thread.sleep(2000); // to be sure topology is configured
+
         if (workerState == WorkerState.WORKING) {
             log.debug("Node already working");
             return;
