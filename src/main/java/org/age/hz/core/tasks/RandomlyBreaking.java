@@ -15,11 +15,11 @@ public class RandomlyBreaking extends SimpleLongRunning {
 
     private final int initialIterations;
 
-    private final String exceptionProbability;
+    private final double exceptionProbability;
 
     @Inject
     public RandomlyBreaking(@Value("${rand.task.initial.iterations:10}") int initialIterations,
-                            @Value("${rand.task.exception.probability:0.3}") String exceptionProbability) {
+                            @Value("${rand.task.exception.probability:0.3}") double exceptionProbability) {
         this.initialIterations = initialIterations;
         this.exceptionProbability = exceptionProbability;
     }
@@ -28,7 +28,7 @@ public class RandomlyBreaking extends SimpleLongRunning {
     protected void additionalAction(int iteration) {
         if (iteration > initialIterations) {
             double randomValue = RandomUtils.nextDouble(0.0, 1.0);
-            if (randomValue < Double.valueOf(exceptionProbability)) {
+            if (randomValue < exceptionProbability) {
                 log.debug("{} < {}, exiting", randomValue, exceptionProbability);
                 throw new RuntimeException();
             }
