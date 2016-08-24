@@ -8,6 +8,7 @@ import com.hazelcast.map.listener.EntryRemovedListener;
 import org.age.hz.core.node.NodeId;
 import org.age.hz.core.services.discovery.events.MemberAddedEvent;
 import org.age.hz.core.services.discovery.events.MemberRemovedEvent;
+import org.age.hz.core.utils.TimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +31,8 @@ public class NeighboursListener implements EntryAddedListener<String, NodeId>,
 
     @Override
     public void entryAdded(EntryEvent<String, NodeId> event) {
+        long timestamp = System.currentTimeMillis();
+        log.warn("{},add,{},{}", TimeUtils.toString(timestamp),timestamp, event.getValue().getNodeId());
 
         log.debug("NeighboursListener entry added: {}", event);
         eventBus.post(new MemberAddedEvent(event));
@@ -37,12 +40,18 @@ public class NeighboursListener implements EntryAddedListener<String, NodeId>,
 
     @Override
     public void entryEvicted(EntryEvent<String, NodeId> event) {
+        long timestamp = System.currentTimeMillis();
+        log.warn("{},rmv,{},{}", TimeUtils.toString(timestamp), timestamp, event.getValue().getNodeId());
+
         log.debug("NeighboursListener entry evicted: {}", event);
         eventBus.post(new MemberRemovedEvent(event));
     }
 
     @Override
     public void entryRemoved(EntryEvent<String, NodeId> event) {
+        long timestamp = System.currentTimeMillis();
+        log.warn("{},rmv,{},{}", TimeUtils.toString(timestamp), timestamp, event.getKey());
+
         log.debug("NeighboursListener entry removed: {}", event);
         eventBus.post(new MemberRemovedEvent(event));
     }

@@ -6,7 +6,7 @@ import com.hazelcast.core.LifecycleListener;
 import com.hazelcast.map.listener.MapListener;
 import org.age.hz.core.node.NodeId;
 import org.age.hz.core.services.AbstractService;
-import org.age.hz.core.services.discovery.listeners.HazelcastLifecycleListener;
+import org.age.hz.core.utils.TimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.SmartLifecycle;
@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Named
-public class DiscoveryServiceImpl extends AbstractService implements SmartLifecycle, DiscoveryService {
+public class DiscoveryServiceImpl extends AbstractService implements DiscoveryService {
 
     private static final Logger log = LoggerFactory.getLogger(DiscoveryServiceImpl.class);
 
@@ -95,6 +95,9 @@ public class DiscoveryServiceImpl extends AbstractService implements SmartLifecy
 
     @Override
     public void cleanUp() {
+        long timestamp = System.currentTimeMillis();
+        log.warn("{},ext,{},{}", TimeUtils.toString(timestamp), timestamp, myId.getNodeId());
+
         members.removeEntryListener(neighboursListenerId);
         log.debug("Deleting myself from members map");
         members.remove(myId.getNodeId());

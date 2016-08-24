@@ -4,6 +4,7 @@ import com.google.common.eventbus.EventBus;
 import org.age.hz.core.node.NodeId;
 import org.age.hz.core.services.communication.event.SendEvent;
 import org.age.hz.core.services.topology.TopologyService;
+import org.age.hz.core.utils.TimeUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +60,11 @@ public class RandomRecipientMessageSender implements Task {
         String recipientId = getRecipientId();
         long sendTimestamp = System.currentTimeMillis();
 
-        return new SendEvent(myId.getNodeId(), recipientId, UUID.randomUUID(), sendTimestamp);
+        long timestamp = System.currentTimeMillis();
+        UUID messageId = UUID.randomUUID();
+        log.warn("{},snd,{},{}", TimeUtils.toString(timestamp), timestamp, messageId.toString());
+
+        return new SendEvent(myId.getNodeId(), recipientId, messageId, sendTimestamp);
     }
 
     private String getRecipientId() {

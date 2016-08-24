@@ -1,5 +1,7 @@
 package org.age.hz.core.tasks;
 
+import org.age.hz.core.node.NodeId;
+import org.age.hz.core.services.discovery.DiscoveryService;
 import org.apache.commons.lang3.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,11 +19,18 @@ public class RandomlyBreaking extends SimpleLongRunning {
 
     private final double exceptionProbability;
 
+    private final NodeId myId;
+
+    private final DiscoveryService discoveryService;
+
     @Inject
     public RandomlyBreaking(@Value("${rand.task.initial.iterations:10}") int initialIterations,
-                            @Value("${rand.task.exception.probability:0.3}") double exceptionProbability) {
+                            @Value("${rand.task.exception.probability:0.3}") double exceptionProbability,
+                            NodeId myId, DiscoveryService discoveryService) {
         this.initialIterations = initialIterations;
         this.exceptionProbability = exceptionProbability;
+        this.myId = myId;
+        this.discoveryService = discoveryService;
     }
 
     @Override
@@ -30,6 +39,9 @@ public class RandomlyBreaking extends SimpleLongRunning {
             double randomValue = RandomUtils.nextDouble(0.0, 1.0);
             if (randomValue < exceptionProbability) {
                 log.debug("{} < {}, exiting", randomValue, exceptionProbability);
+
+                discoveryService.stop();
+
                 throw new RuntimeException();
             }
         }

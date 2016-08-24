@@ -13,6 +13,10 @@ public class ReceivedMessageProcessor {
     private static final Logger log = LoggerFactory.getLogger(ReceivedMessageProcessor.class);
 
     public void process(ReceiveEvent receiveEvent) {
+
+        long timestamp = System.currentTimeMillis();
+        log.warn("{},rcv,{},{},{}", TimeUtils.toString(timestamp), timestamp, receiveEvent.getSendTimestamp(), receiveEvent.getMessageId());
+
         String sendTime = TimeUtils.toString(receiveEvent.getSendTimestamp());
         long receiveTimestamp = System.currentTimeMillis();
         String receiveTime = TimeUtils.toString(receiveTimestamp);
